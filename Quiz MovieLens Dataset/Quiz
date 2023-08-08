@@ -1,0 +1,110 @@
+# Course/Capstone Project: All Learners/Quiz: MovieLens Dataset
+
+Quiz due Aug 21, 2023 21:37 -03
+
+All of the questions in this quiz involve working with the datasets you've created using the code we provided.
+
+Q1
+1.0/1.0 point (graded)
+How many rows and columns are there in the edx dataset?
+
+Number of rows:
+9000055
+ 
+Number of columns:
+6
+
+You have used 2 of 10 attemptsSome problems have options such as save, reset, hints, or show answer. These options follow the Submit button.Your answers were previously saved. Click 'Enviar' to grade them.Revisar
+
+Q2
+1.0/1.0 point (graded)
+How many zeros were given as ratings in the edx dataset?
+0
+ 
+How many threes were given as ratings in the edx dataset?
+2121240
+ 
+You have used 1 of 10 attemptsSome problems have options such as save, reset, hints, or show answer. These options follow the Submit button.
+
+Q3
+1/1 point (graded)
+How many different movies are in the edx dataset?
+10677
+
+You have used 1 of 10 attemptsSome problems have options such as save, reset, hints, or show answer. These options follow the Submit button.
+
+Q4
+1/1 point (graded)
+How many different users are in the edx dataset?
+69878
+
+You have used 1 of 10 attemptsSome problems have options such as save, reset, hints, or show answer. These options follow the Submit button.
+
+Q5
+1.0/1.0 point (graded)
+How many movie ratings are in each of the following genres in the edx dataset?
+
+Drama:
+3910127 
+ 
+Comedy:
+3540930
+ 
+Thriller:
+2325899
+ 
+Romance:
+1712100
+ 
+You have used 1 of 10 attemptsSome problems have options such as save, reset, hints, or show answer. These options follow the Submit button.
+
+Q6
+1/1 point (graded)
+Which movie has the greatest number of ratings?
+
+Forrest Gump
+
+Jurassic Park
+
+[x]Pulp Fiction
+
+The Shawshank Redemption
+
+Speed 2: Cruise Control
+
+You have used 1 of 2 attemptsSome problems have options such as save, reset, hints, or show answer. These options follow the Submit button.
+
+Q7
+1/1 point (graded)
+What are the five most given ratings in order from most to least?
+
+[x]4, 3, 5, 3.5, 2
+
+3.5, 4.5, 1, 3, 5
+
+0.5, 5, 1, 4.5, 1.5
+
+5, 3, 1, 4.5, 3.5
+
+2, 3.5, 5, 3, 4
+
+You have used 1 of 2 attemptsSome problems have options such as save, reset, hints, or show answer. These options follow the Submit button.
+
+Q8
+1/1 point (graded)
+True or False: In general, half star ratings are less common than whole star ratings (e.g., there are fewer ratings of 3.5 than there are ratings of 3 or 4, etc.).
+
+[x]True
+
+False
+
+You have used 1 of 1 attemptSome problems have options such as save, reset, hints, or show answer. These options follow the Submit button.
+Ask your questions or make your comments about the Movielens Quiz here! Remember, one of the best ways to reinforce your own learning is by explaining something to someone else, so we encourage you to answer each other's questions (without giving away the answers, of course). 
+
+Some reminders:
+
+Search the discussion board before posting to see if someone else has asked the same thing before asking a new question.
+Please be specific in the title and body of your post regarding which question you're asking about to facilitate answering your question.
+Posting snippets of code is okay, but posting full code solutions is not.
+
+If you do post snippets of code, please format it as code for readability. If you're not sure how to do this, there are instructions in a pinned post in the "general" discussion forum.
