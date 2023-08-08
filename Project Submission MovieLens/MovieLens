@@ -1,12 +1,159 @@
-# Course/Capstone Project: All Learners/Project Submission: MovieLens
+--- 
+title: "HarvardX - PH125.9x Data Science: Capstone - Movie Lens"
+subtitle: "HarvardX - PH125.9x Data Science Capstone"
+author: "Levi Lucena - github.com/LeviLucena"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+site: bookdown::bookdown_site
+output: 
+  bookdown::pdf_book:
+    toc: true
+    toc_depth: 3
+    number_sections: true
+    keep_tex: true
+    df_print: kable
+  html_document: 
+    number_sections: true
+    df_print: paged
+    theme: united
+    
+documentclass: report
+geometry: "a4paper,left=2.5cm,right=2.5cm,top=2.5cm,bottom=2.5cm"
+lot: yes
+lof: yes
 
-Your submission for this project is three files:
+fontsize: 11pt
+mainfont: "Lato"
+monofont: "Hack"
+monofontoptions: "Scale=0.7"
 
-Your report in Rmd format
-Your report in PDF format (knit from your Rmd file)
-A script in R format that generates your predicted movie ratings and RMSE score (should contain all code and comments for your project)
-You may upload the three files directly to the edX platform or submit a GitHub link in the text response box below.
+bibliography: [packages.bib, bibliography.bib]
+biblio-style: apalike
+link-citations: yes
+colorlinks: yes
 
-To upload and submit your files press the "Choose Files" button, select three files at once (using the control key on a Windows machine or command key on a Mac) and press "Choose," type a description for each (PDF, Rmd, R), and then press the "Upload files" button. If uploading files, we recommend also providing a link to a GitHub repository containing the three files above in case there is a problem with the upload process.
+github-repo: LeviLucena/HarvardX-Data-Science-Capstone
+description: "HarvardX - PH125.9x Data Science Capstone"
+---
 
-Note that when downloading files for peer assessments, R and Rmd files will be downloaded as txt files by default. 
+```{r,echo=FALSE,message=FALSE}
+###################################################################################################
+## GLOBAL SETUP
+## 
+
+# Trigger line numbering
+knitr::opts_chunk$set(
+  class.source = "numberLines lineAnchors", 
+  class.output = c("numberLines lineAnchors chunkout") 
+)
+
+# knitr global settings - By default, the final document will not include source code unless
+# expressly stated.
+knitr::opts_chunk$set(
+  # Chunks
+  eval = TRUE,
+  cache = TRUE,
+  echo = FALSE,
+  message = FALSE,
+  warning = FALSE,
+
+  # filepaths
+  fig.path =   'build/figure/graphics-', 
+  cache.path = 'build/cache/graphics-', 
+  
+  # Graphics
+  out.width = "70%",
+  fig.align = "center",
+  # fig.height = 3,
+
+  # Text size
+  size = "small"
+)
+
+if (knitr::is_html_output()) {
+  knitr::opts_chunk$set(dev = "png")
+} else {
+  knitr::opts_chunk$set(dev = "pdf")
+}
+
+# Modify the size of the code chunks
+# https://stackoverflow.com/questions/25646333/code-chunk-font-size-in-rmarkdown-with-knitr-and-latex
+def.chunk.hook <- knitr::knit_hooks$get("chunk")
+
+knitr::knit_hooks$set(chunk = function(x, options) {
+  x <- def.chunk.hook(x, options)
+  ifelse(options$size != "normalsize", paste0("\n \\", options$size, "\n\n", x, "\n\n \\normalsize"), x)
+})
+
+```
+
+
+```{css echo=FALSE}
+code {
+  font-family: Hack, monospace;
+  font-size: 85%;
+  padding: 0;
+  padding-top: 0.2em;
+  padding-bottom: 0.2em;
+  background-color: rgba(0,0,0,0.04);
+  border-radius: 3px;
+}
+
+code:before,
+code:after {
+  letter-spacing: -0.2em;
+  content: "\00a0";
+}
+
+```
+
+<!--- Better HTML output --->
+```{css echo=FALSE}
+pre {
+  font-family: Hack, monospace;
+  font-size: 75%;
+  margin-left: 15%; 
+  #padding: 25%;
+  padding-top: 0.2em;
+  padding-bottom: 0.2em;
+  background-color: rgba(0,0,255,0.1);
+  #border-radius: 10px;
+}
+
+```
+
+
+
+```{r preamble,echo=FALSE,message=FALSE}
+### Preamble
+
+# Usual libraries
+library(tidyverse)
+library(lubridate) 
+library(gridExtra)
+
+# Evaluation metrics including RMSE
+library(Metrics)
+
+# Data partitioning, machine learning models, training and prediction
+library(caret)
+
+# Use ds_theme_set()
+library(dslabs)
+ds_theme_set()
+
+# Make things pretty
+library(kableExtra)
+library(RColorBrewer)
+library(corrplot)
+
+```
+
+
+```{r echo=FALSE,message=FALSE}
+## Coding style
+# - The code makes heavy uses of tidyverse functions even when there would be more concise 
+#   ways to write it. As the expression goes _"Premature optimisation is the root of all evil."_
+#   
+# - local({ ... }) is used when temporary variables are needed. Executing within a local
+# scope avoids cluttering the environment with those variables. 
+```
