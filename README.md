@@ -1,4 +1,4 @@
-# HarvardX PH125.9x Data Science: Capstone
+# HarvardX PH125.9x Data Science: Capstone 🎓
 ### Data Science: Capstone
 Show what you’ve learned from the Professional Certificate Program in Data Science.
 
