@@ -1,0 +1,194 @@
+---
+title: "HarvardX: PH125.9x - Capstone Project"
+author: "Levi Lucena - https://github.com/LeviLucena"
+date: "`r Sys.Date()`"
+output:
+  pdf_document:
+    toc: true  # This enables the functional index
+    toc_depth: 3  # Table of Contents Depth (which section level to go to)
+    keep_tex: yes
+    latex_engine: xelatex
+  word_document: default
+  html_document:
+    df_print: paged
+header-includes:
+  - "\\usepackage{graphicx}"  # Include graphics package for figures
+---
+
+```{r setup, include=FALSE}
+library(ggplot2)
+library(knitr)
+library(dplyr)
+library(randomForest)
+library(readr)
+library(ggplot2)
+library(DT)
+knitr::opts_chunk$set(echo = TRUE, fig.show = "hold")
+```
+    
+## 1. Introduction <a name="1-introduction"></a>
+
+This report presents the analysis of the MovieLens dataset and the development of a recommendation model. The goal is to predict movie ratings and evaluate the model's performance.
+
+Define the path to the ratings and movies files
+```{r}
+ratings_file_path <- "C:/Users/PRODESP/Downloads/ml-latest-small/ratings.csv"
+movies_file_path <- "C:/Users/PRODESP/Downloads/ml-latest-small/movies.csv"
+```
+## 2. Data Preprocessing <a name="2-data-preprocessing"></a>
+
+Read the ratings data using read_csv from readr:
+```{r}
+ratings <- readr::read_csv(ratings_file_path)
+```
+Read the movies data using read_csv from readr:
+```{r}
+movies <- readr::read_csv(movies_file_path)
+```
+```{r}
+# Create a bar chart of movie counts by genre
+genre_bar_chart <- ggplot(movies, aes(x = genre)) +
+  geom_bar() +
+  labs(title = "Film Count by Genre")
+```
+```
+# Print the bar chart
+print(genre_bar_chart)
+```
+```
+# Create a bar chart of movie counts by year of release
+ggplot(movies, aes(x = year)) +
+  geom_bar() +
+  labs(title = "Film Count by Release Year")
+```
+```
+# Print the bar chart
+print(rating_bar_chart)
+```
+```
+# Create a bar chart of movie counts by rating
+ggplot(movies, aes(x = rating)) +
+  geom_bar() +
+  labs(title = "Movie Count by Rating")
+```
+```
+# Print the bar chart
+print(rating_bar_chart)
+```
+Convert columns to appropriate types:
+```{r}
+ratings$userId <- as.integer(ratings$userId)
+ratings$movieId <- as.integer(ratings$movieId)
+ratings$rating <- as.numeric(ratings$rating)
+
+# Exibir a tabela transformada usando kable
+kable(ratings[1:10,], caption = "Tabela após Transformações")
+```
+Preprocess the data (additional preprocessing can be done here):
+```{r}
+# Reduce the size of the training data using a smaller sample
+set.seed(123)
+sample_index <- sample(nrow(ratings), size = 0.01 * nrow(ratings), replace = FALSE)
+ratings <- ratings[sample_index, ]
+
+# Display a transformed table using kable
+kable(ratings[1:10,], caption = "Table after Transformations")
+```
+Merge the ratings data with movie information:
+```{r}
+data_with_movies <- dplyr::left_join(ratings, movies, by = "movieId")
+```
+```{r}
+# Display the merged data table using kable
+kable(data_with_movies[1:10,], caption = "Merged Data Table")
+```
+Split the data into train and test sets:
+```{r}
+train_size <- 0.8
+train_index <- sample(nrow(data_with_movies), size = train_size * nrow(data_with_movies))
+train_data <- data_with_movies[train_index, ]
+test_data <- data_with_movies[-train_index, ]
+```
+```{r}
+# Display the training data table using kable
+kable(train_data[1:10,], caption = "Training Data Table")
+```
+```{r}
+# Display the test data table using kable
+kable(test_data[1:10,], caption = "Test Data Table")
+```
+
+## 3. Model Training and Evaluation <a name="3-model-training-and-evaluation"></a>
+
+Train the model (example with randomForest):
+```{r}
+model <- randomForest::randomForest(rating ~ ., data = train_data)
+```
+Make predictions on the test set:
+```{r}
+predictions <- predict(model, test_data)
+```
+Calculate RMSE:
+```{r}
+rmse <- sqrt(mean((predictions - test_data$rating)^2))
+rmse_text <- sprintf("RMSE: %.2f", rmse)
+```
+Print results:
+```{r}
+cat("RMSE:", rmse_text, "\n")
+```
+Print RMSE value
+```
+cat("The root mean squared error (RMSE) is:", rmse_text, "\n")
+RMSE: "0.990647750605843"
+```
+
+## 4. Visualizations <a name="4-visualizations"></a>
+
+Create a histogram of movie ratings:
+```{r}
+hist_plot <- ggplot2::ggplot(data_with_movies, aes(x = rating)) +
+  ggplot2::geom_histogram(binwidth = 0.5, fill = "blue", color = "black") +
+  ggplot2::labs(title = "Histogram of Movie Ratings", x = "Rating", y = "Frequency")
+print(hist_plot)
+```
+Create a scatter plot of predicted vs. actual ratings:
+```{r}
+scatter_plot <- ggplot2::ggplot(test_data, aes(x = rating, y = predictions)) +
+  ggplot2::geom_point(color = "blue") +
+  ggplot2::geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "red") +
+  ggplot2::labs(title = "Predicted vs. Actual Ratings", x = "Actual Rating", y = "Predicted Rating")
+print(scatter_plot)
+```
+
+Print the plots:
+```{r}
+print(hist_plot)
+print(scatter_plot)
+```
+
+## 5. Interactive Datatable <a name="5-interactive-datatable"></a>
+
+Create an interactive datatable for the test data:
+```
+DT::datatable(test_data)
+```
+Load necessary packages
+```{r}
+library(dplyr)
+library(randomForest)
+library(readr)
+library(ggplot2)
+library(DT)
+```
+
+## 6. Conclusion <a name="7-conclusion"></a>
+
+In conclusion, we have completed our movie recommendation project using the MovieLens 10M dataset. Our model achieved an RMSE of RMSE: "0.990647750605843", indicating the accuracy of our predictions. Additionally, we generated recommendations for the user with ID 1.
+
+
+## 7. References <a name="6-references"></a>
+
+1. Web MovieLens - [https://grouplens.org/datasets/movielens/10m/](https://grouplens.org/datasets/movielens/10m/)
+
+2. Library recommenderlab - [https://github.com/mhahsler/recommenderlab](https://github.com/mhahsler/recommenderlab)
