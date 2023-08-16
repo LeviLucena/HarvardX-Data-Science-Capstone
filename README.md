@@ -1,7 +1,5 @@
 # HarvardX PH125.9x Capstone Project: Movie Recommendation 🎓
 
-![Movie Recommendation](https://your-image-link-here.png)
-
 # Course description
 To become an expert data scientist you need practice and experience. By completing this capstone project you will get an opportunity to apply the knowledge and skills in R data analysis that you have gained throughout the series. This final project will test your skills in data visualization, probability, inference and modeling, data wrangling, data organization, regression, and machine learning.
 
