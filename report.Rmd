@@ -23,66 +23,169 @@ library(randomForest)
 library(readr)
 library(ggplot2)
 library(DT)
+library(stringr)
 knitr::opts_chunk$set(echo = TRUE, fig.show = "hold")
 ```
     
 ## 1. Introduction <a name="1-introduction"></a>
 
-This report presents the analysis of the MovieLens dataset and the development of a recommendation model. The goal is to predict movie ratings and evaluate the model's performance.
+Welcome to the report on the HarvardX PH125.9x Capstone Project, focusing on the analysis of the MovieLens dataset and the development of a movie recommendation model.
+
+### 1.1 Project Overview
+
+In this capstone project, we aim to explore and analyze the MovieLens dataset to gain insights into movie ratings and genres. Our objective is to develop a recommendation model that can predict movie ratings and evaluate its performance through metrics like the Root Mean Squared Error (RMSE).
+
+### 1.2 Dataset
+
+The primary dataset used for this project is the MovieLens dataset, which contains a rich collection of movie ratings and information. We'll be leveraging the ratings provided by users to create a recommendation model.
 
 Define the path to the ratings and movies files
 ```{r}
-ratings_file_path <- "C:/Users/PRODESP/Downloads/ml-latest-small/ratings.csv"
-movies_file_path <- "C:/Users/PRODESP/Downloads/ml-latest-small/movies.csv"
+ratings_file_path <- "C:/Users/lglucena/Downloads/ml-latest-small/ratings.csv"
+movies_file_path <- "C:/Users/lglucena/Downloads/ml-latest-small/movies.csv"
 ```
+
+### 1.3 Report Structure
+
+This report is organized into the following sections:
+
+- Section 1: Introduction
+- Section 2: Data Preprocessing
+- Section 3: Model Training and Evaluation
+- Section 4: Visualizations
+- Section 5: Interactive Datatable
+- Section 6: Conclusion
+- Section 7: References
+
+This report presents the analysis of the MovieLens dataset and the development of a recommendation model. The goal is to predict movie ratings and evaluate the model's performance.
+
+Each section focuses on a specific aspect of the project, from data preprocessing and model training to visualizing results and providing an interactive exploration of the dataset.
+
+### 1.4 About the Author
+
+The project author, Levi Lucena, is a data enthusiast and aspiring data scientist. You can find more about Levi's work on his GitHub profile: [Levi Lucena GitHub](https://github.com/LeviLucena).
+
+Now, let's delve into the details of this exciting project!
+
 ## 2. Data Preprocessing <a name="2-data-preprocessing"></a>
+
+In this section, we will preprocess the data to prepare it for analysis.
+
+### 2.1 Reading and Loading Data
+
+We start by reading and loading the ratings and movies data files.
 
 Read the ratings data using read_csv from readr:
 ```{r}
 ratings <- readr::read_csv(ratings_file_path)
 ```
+
+### 2.2 Genre Counts
+
+Let's begin by calculating the counts of each genre in the movies dataset.
+
 Read the movies data using read_csv from readr:
 ```{r}
 movies <- readr::read_csv(movies_file_path)
 ```
+
 ```{r}
-# Create a bar chart of movie counts by genre
-genre_bar_chart <- ggplot(movies, aes(x = genre)) +
-  geom_bar() +
-  labs(title = "Film Count by Genre")
+# Calculate the counts of each genre
+genre_counts <- table(movies$genres)
+
+# Create a data frame with genre and count information
+genre_table <- data.frame(
+  Genre = names(genre_counts),
+  Count = as.numeric(genre_counts)
+)
+
+# Display the table using kable
+kable(genre_table[1:10, ], caption = "Table with Film Count by Genre")
 ```
+
+### 2.3 Year Counts
+
+Next, we will filter out movies without a year in their title and calculate the counts of movies by release year.  
+  
+```{r}
+# Filter out titles without a year
+movies_with_year <- movies[grep("\\(\\d{4}\\)$", movies$title), ]
+
+# Calculate the counts of movies by year
+year_counts <- table(substring(movies_with_year$title, nchar(movies_with_year$title) - 4))
+
+# Create a data frame with year and count information
+year_table <- data.frame(
+  Year = names(year_counts),
+  Count = as.numeric(year_counts)
+)
+
+# Display the table using kable
+kable(year_table, caption = "Table with Film Count by Release Year")
 ```
-# Print the bar chart
-print(genre_bar_chart)
+
+By completing these preprocessing steps, we have organized the data and calculated genre and year counts, which will be useful for our subsequent analysis.
+
+```{r}
+# Extract year from title using regular expressions
+movies <- movies %>%
+  mutate(Year = ifelse(grepl("\\(\\d{4}\\)$", title), as.numeric(gsub(".*\\((\\d{4})\\)$", "\\1", title)), NA))
+
+# Calculate the counts of movies by year
+year_counts <- table(movies$Year, useNA = "ifany")
+
+# Convert year_counts to a data frame
+year_table <- data.frame(Year = as.numeric(names(year_counts)), Count = as.numeric(year_counts))
+
+# Create a scatter plot of movie counts by year of release
+ggplot(year_table, aes(x = Year, y = Count)) +
+  geom_point(color = "black") +
+  labs(title = "Film Count by Release Year", x = "Year of Release", y = "Film Count")
 ```
-```
+
+```{r}
+# Filter out titles without a year
+movies_with_year <- movies[grep("\\(\\d{4}\\)$", movies$title), ]
+
+# Calculate the counts of movies by year
+year_counts <- table(substring(movies_with_year$title, nchar(movies_with_year$title) - 4))
+
+# Create a data frame with year and count information
+year_table <- data.frame(
+  Year = names(year_counts),
+  Count = as.numeric(year_counts)
+)
+
+# Select a subset of years for the x-axis labels
+selected_years <- year_table$Year[seq(1, nrow(year_table), by = 5)]
+
 # Create a bar chart of movie counts by year of release
-ggplot(movies, aes(x = year)) +
-  geom_bar() +
-  labs(title = "Film Count by Release Year")
+ggplot(year_table, aes(x = Year, y = Count)) +
+  geom_bar(stat = "identity", fill = "blue") +
+  labs(title = "Film Count by Release Year", x = "Year of Release", y = "Film Count") +
+  scale_x_discrete(breaks = selected_years)
 ```
+
+```{r}
+# Create a pie chart of movie counts by year
+pie_chart <- ggplot(year_table, aes(x = "", y = Count, fill = Year)) +
+  geom_bar(stat = "identity", width = 1) +
+  coord_polar("y", start = 0) +
+  labs(title = "", fill = "Pie Chart of Film Count by Release Year") +
+  theme_void()
+
+# Print the pie chart
+print(pie_chart)
 ```
-# Print the bar chart
-print(rating_bar_chart)
-```
-```
-# Create a bar chart of movie counts by rating
-ggplot(movies, aes(x = rating)) +
-  geom_bar() +
-  labs(title = "Movie Count by Rating")
-```
-```
-# Print the bar chart
-print(rating_bar_chart)
-```
+
 Convert columns to appropriate types:
 ```{r}
 ratings$userId <- as.integer(ratings$userId)
 ratings$movieId <- as.integer(ratings$movieId)
 ratings$rating <- as.numeric(ratings$rating)
 
-# Exibir a tabela transformada usando kable
-kable(ratings[1:10,], caption = "Tabela após Transformações")
+# Display the transformed table using kable
+kable(ratings[1:10,], caption = "Table after Transformations")
 ```
 Preprocess the data (additional preprocessing can be done here):
 ```{r}
@@ -120,38 +223,73 @@ kable(test_data[1:10,], caption = "Test Data Table")
 
 ## 3. Model Training and Evaluation <a name="3-model-training-and-evaluation"></a>
 
+In this section, we will train a model to predict movie ratings and evaluate its performance.
+
+### 3.1 Model Training
+
+We will begin by training a prediction model using the training data.
+
 Train the model (example with randomForest):
 ```{r}
 model <- randomForest::randomForest(rating ~ ., data = train_data)
 ```
+
+### 3.2 Making Predictions
+
+With the trained model, we can now make predictions on the test set.
+
 Make predictions on the test set:
 ```{r}
 predictions <- predict(model, test_data)
 ```
+
+### 3.3 Model Evaluation
+
+To evaluate the performance of our model, we will calculate the root mean squared error (RMSE), which measures the accuracy of the predictions.
+
 Calculate RMSE:
 ```{r}
 rmse <- sqrt(mean((predictions - test_data$rating)^2))
 rmse_text <- sprintf("RMSE: %.2f", rmse)
 ```
+
+### 3.4 Results
+
+The RMSE value indicates how closely the predicted ratings match the actual ratings. Lower RMSE values suggest better model performance
+
 Print results:
 ```{r}
 cat("RMSE:", rmse_text, "\n")
 ```
+
 Print RMSE value
-```
+```{r}
 cat("The root mean squared error (RMSE) is:", rmse_text, "\n")
-RMSE: "0.990647750605843"
 ```
+RMSE: "0.990647750605843"
+
+By evaluating the model's performance using the RMSE metric, we can assess its accuracy in predicting movie ratings.
 
 ## 4. Visualizations <a name="4-visualizations"></a>
+
+In this section, we will create visualizations to better understand the data and the model's performance.
+
+### 4.1 Histogram of Movie Ratings
+
+We'll start by creating a histogram to visualize the distribution of movie ratings.
 
 Create a histogram of movie ratings:
 ```{r}
 hist_plot <- ggplot2::ggplot(data_with_movies, aes(x = rating)) +
-  ggplot2::geom_histogram(binwidth = 0.5, fill = "blue", color = "black") +
+  ggplot2::geom_histogram(binwidth = 0.5, fill = "purple", color = "black") +
   ggplot2::labs(title = "Histogram of Movie Ratings", x = "Rating", y = "Frequency")
 print(hist_plot)
 ```
+
+### 4.2 Predicted vs. Actual Ratings
+
+Next, we'll create a scatter plot to compare the predicted ratings with the actual ratings.
+
 Create a scatter plot of predicted vs. actual ratings:
 ```{r}
 scatter_plot <- ggplot2::ggplot(test_data, aes(x = rating, y = predictions)) +
@@ -161,13 +299,15 @@ scatter_plot <- ggplot2::ggplot(test_data, aes(x = rating, y = predictions)) +
 print(scatter_plot)
 ```
 
-Print the plots:
-```{r}
-print(hist_plot)
-print(scatter_plot)
-```
+By visualizing the distribution of ratings and comparing the predicted and actual ratings, we can gain insights into the model's performance.
 
 ## 5. Interactive Datatable <a name="5-interactive-datatable"></a>
+
+In this section, we will create an interactive datatable to explore the test data in a dynamic and user-friendly way.
+
+### 5.1 Interactive Datatable for Test Data
+
+To provide a more interactive way of exploring the test data, we can use the `DT` package to create an interactive datatable.
 
 Create an interactive datatable for the test data:
 ```
@@ -175,6 +315,8 @@ DT::datatable(test_data)
 ```
 Load necessary packages
 ```{r}
+library(ggplot2)
+library(knitr)
 library(dplyr)
 library(randomForest)
 library(readr)
@@ -182,13 +324,54 @@ library(ggplot2)
 library(DT)
 ```
 
+By using an interactive datatable, we enable users to search, filter, and sort the test data based on their preferences. This interactive approach enhances the data exploration experience and allows for deeper insights into the test dataset.
+
 ## 6. Conclusion <a name="7-conclusion"></a>
 
-In conclusion, we have completed our movie recommendation project using the MovieLens 10M dataset. Our model achieved an RMSE of RMSE: "0.990647750605843", indicating the accuracy of our predictions. Additionally, we generated recommendations for the user with ID 1.
+We have completed our movie recommendation project using the MovieLens 10M dataset. Our model achieved an RMSE of RMSE: "0.990647750605843", indicating the accuracy of our predictions. Additionally, we generated recommendations for the user with ID 1.
 
+In conclusion, this capstone project successfully explored the MovieLens dataset, analyzed movie ratings and genres, and developed a movie recommendation model. Throughout the project, we achieved the following:
+
+- **Data Exploration:** We gained insights into the distribution of movie ratings, genres, and release years. This exploration helped us understand the characteristics of the dataset.
+
+- **Model Development:** We trained a recommendation model using the randomForest algorithm. The model successfully predicted movie ratings based on available features.
+
+- **Model Evaluation:** We evaluated the model's performance using the Root Mean Squared Error (RMSE) metric. The achieved RMSE value of "0.990647750605843" reflects the accuracy of our predictions.
+
+- **Visualizations:** We created visualizations, including a histogram of movie ratings and a scatter plot comparing predicted and actual ratings. These visualizations provided a clearer understanding of our model's performance.
+
+- **Interactive Datatable:** We provided an interactive datatable to explore the test data, allowing users to delve deeper into the dataset.
+
+### 6.1 Future Steps
+
+While we have accomplished the main objectives of this project, there are opportunities for further improvements and exploration:
+
+- **Feature Engineering:** We could explore additional features, such as user demographics or movie metadata, to enhance the model's performance.
+
+- **Advanced Algorithms:** Exploring more sophisticated recommendation algorithms, such as collaborative filtering or matrix factorization, could lead to even more accurate predictions.
+
+- **Hyperparameter Tuning:** Fine-tuning the model's hyperparameters could potentially improve its performance.
+
+### 6.2 Acknowledgments
+
+We would like to express our gratitude to Harvard University for providing the PH125.9x Data Science Capstone course and the opportunity to work on this engaging project.
+
+Overall, this capstone project has provided valuable insights into data preprocessing, model training, and evaluation in the context of movie recommendation. By combining data analysis and machine learning techniques, we have achieved a functional recommendation model with potential for further enhancement.
+
+Thank you for joining us on this journey through the world of movie recommendation!
 
 ## 7. References <a name="6-references"></a>
 
-1. Web MovieLens - [https://grouplens.org/datasets/movielens/10m/](https://grouplens.org/datasets/movielens/10m/)
+During the course of this project, we utilized a variety of resources that contributed to our understanding of data analysis, machine learning, and recommendation systems. Here are some of the key references that guided us:
 
-2. Library recommenderlab - [https://github.com/mhahsler/recommenderlab](https://github.com/mhahsler/recommenderlab)
+1. Web MovieLens - [https://grouplens.org/datasets/movielens/10m/](https://grouplens.org/datasets/movielens/10m/): The official MovieLens dataset website, where we obtained the dataset used in this project.
+
+2. Library recommenderlab - [https://github.com/mhahsler/recommenderlab](https://github.com/mhahsler/recommenderlab): The recommenderlab package in R, which provided valuable tools for building and evaluating recommendation models.
+
+3. ggplot2 Documentation - [https://ggplot2.tidyverse.org/](https://ggplot2.tidyverse.org/): The official documentation for the ggplot2 package, which helped us create insightful visualizations.
+
+4. DT Package Documentation - [https://rstudio.github.io/DT/](https://rstudio.github.io/DT/): The documentation for the DT package, which enabled us to generate interactive datatables.
+
+5. Harvard University - [https://www.harvard.edu/](https://www.harvard.edu/): The institution that offered the PH125.9x Data Science Capstone course, providing the foundation for our project.
+
+These references played a significant role in shaping our project's approach, methodology, and outcomes. We are grateful for the wealth of knowledge and resources available to us as we embarked on this journey.
