@@ -9,6 +9,9 @@
 # Set the working directory to the location of your files
 setwd("C:/Path/To/Your/Files")
 
+ratings_file_path <- "C:/Users/lglucena/Downloads/ml-latest-small/ratings.csv"
+movies_file_path <- "C:/Users/lglucena/Downloads/ml-latest-small/movies.csv"
+
 # Load necessary packages
 library(ggplot2)
 library(knitr)
