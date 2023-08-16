@@ -47,8 +47,4 @@ The [Conclusion](#6-conclusion) section summarizes the project's achievements, i
 
 The [References](#7-references) section acknowledges the resources and references that contributed to the project's development.
 
-## About the Author
-
-The project author, [Your Name](https://github.com/your-github-username), is a data enthusiast and aspiring data scientist. You can find more about the author's work on their GitHub profile.
-
 Feel free to explore the code and report in this repository to learn more about the movie recommendation project.
